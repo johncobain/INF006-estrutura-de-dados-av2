@@ -56,7 +56,7 @@ void isEqual(FILE *fp_test, FILE *fp_res){
     char lineRes[1000];
     while (fgets(lineTest, sizeof(lineTest), fp_test) != NULL){
         if (fgets(lineRes, sizeof(lineRes), fp_res) != NULL){
-            printf("T: %s", lineTest);
+            printf("T: %s\n", lineTest);
             printf("R: %s\n", lineRes);
             if (strcmp(lineTest, lineRes) == 0){
                 printf("\033[1;32mA linha é igual.\033[0m\n\n");
