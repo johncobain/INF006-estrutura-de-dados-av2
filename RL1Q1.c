@@ -16,7 +16,7 @@ int main(){
     printf("TEST");
 
     // while (fgets(line, sizeof(line), fp_in) != NULL){
-    //     char space[] = " ";
+    //     char space[] = " "; 
     // }
 
     fclose(fp_in);
