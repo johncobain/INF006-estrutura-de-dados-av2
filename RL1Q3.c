@@ -5,8 +5,9 @@
 
 typedef struct LI
 {
-    int num;
+    float num;
     struct LI *prox;
+    int ancorado;
 }LI;
 
 typedef struct LE
@@ -18,15 +19,28 @@ typedef struct LE
 }LE;
 
 
-void OrdenarVetor(LE arr[], int qtdLE) {
+void OrdenarVetor(LE arr[], int qtdL, char identificador) {
     int i, j, temp;
-
-    for (i = 0; i < qtdLE - 1; i++) {
-        for (j = 0; j < qtdLE - i - 1 && arr[j].prox != NULL; j++) {
-            if (arr[j].num > arr[j + 1].num) {
-                temp = arr[j].num;
-                arr[j].num = arr[j + 1].num;
-                arr[j + 1].num = temp;
+    float tempF = 0;
+    if(identificador == 'E'){
+        for (i = 0; i < qtdL - 1; i++) {
+            for (j = 0; j < qtdL - i - 1 && arr[j].prox != NULL; j++) {
+                if (arr[j].num > arr[j + 1].num) {
+                    temp = arr[j].num;
+                    arr[j].num = arr[j + 1].num;
+                    arr[j + 1].num = temp;
+                }
+            }
+        }
+    }else
+    if(identificador == 'I'){
+        for (i = 0; i < qtdL - 1; i++) {
+            for (j = 0; j < qtdL - i - 1 && arr[j].prox != NULL; j++) {
+                if (arr[j].num > arr[j + 1].num) {
+                    tempF = arr[j].num;
+                    arr[j].num = arr[j + 1].num;
+                    arr[j + 1].num = tempF;
+                }
             }
         }
     }
@@ -46,7 +60,7 @@ int main(){
     printf("TEST");
 
     while (fgets(line, sizeof(line), fp_in) != NULL){
-        int qtdLE = 0;
+        int qtdLE = 0, qtdLI = 0;
         LE Ancora[1000];
         Ancora[0].anterior = NULL;
 
@@ -65,22 +79,43 @@ int main(){
                 Ancora[i].prox = NULL;
                 Ancora[i].num = atoi(slice);
                 qtdLE++;
-                slice = strtok(NULL, &space);
+                slice = strtok(NULL, space);
             }
         }
 
-        for(int i = 0; i < qtdLE;i++){
-            fprintf(fp_out,"%d ",Ancora[i].num);
-        }
-        fprintf(fp_out," | ");
-        //ordenar lista LE
-        OrdenarVetor(Ancora, qtdLE);
-        printf("\n");
+        OrdenarVetor(Ancora, qtdLE, 'E');
 
+        if(strcmp(slice, "LI") == 0){
+            slice = strtok(NULL, space);
+            for(int i = 0;slice != NULL; i++){
+                if(i > 0){
+                    Elementos[i - 1].prox = & Elementos[i];
+                } 
+                Elementos[i].num = atof(slice);
+                qtdLI++;
+                slice = strtok(NULL, space);
+            }
+        }
+
+        OrdenarVetor(Elementos, qtdLI, 'I');
+
+        // for(int i = 0; i < qtdLE;i++){
+        //     fprintf(fp_out,"%d ",Ancora[i].num);
+        // }
+        // fprintf(fp_out," | ");
+        // //ordenar lista LE
+
+        fprintf(fp_out,"Ancoras: ");
         for(int i = 0; i < qtdLE;i++){
             fprintf(fp_out,"%d ",Ancora[i].num);
         }
-        fprintf(fp_out,"\n");
+
+        fprintf(fp_out,"\nElementos:");
+        for(int i = 0; i < qtdLE;i++){
+            fprintf(fp_out,"%g ",Elementos[i].num);
+        }
+        fprintf(fp_out, "\n");
+
 
         //Adquirir todos os elementos da lista circular após o LI
         // if(strcmp(slice, "LI")){
