@@ -24,7 +24,8 @@ int main() {
 
     while (fgets(line, sizeof(line), fp_in) != NULL) {
         printf("Linha lida: '%s'\n", line); // Log da linha lida
-        line[strcspn(line, "\n")] = '\0'; // Remove o \n da linha lida /*ERROR*/
+        line[strcspn(line, "\n")] = '\0'; // Remove o \n da linha lida
+        line[strcspn(line, "\r")] = '\0'; // Remove o \r da linha lida
         printf("Linha lida: '%s'\n", line); // Log da linha lida
 
         Stack stack, secondary;
