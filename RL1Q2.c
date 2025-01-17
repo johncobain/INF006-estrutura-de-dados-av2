@@ -22,43 +22,56 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    char space[] = " ";
+    int lineCount = 0;
+
     while (fgets(line, sizeof(line), fp_in) != NULL) {
-        printf("Linha lida: '%s'\n", line); // Log da linha lida
+        char text[1000];
+        int initialized = 0;
+        int popCount = 0;
+
         line[strcspn(line, "\n")] = '\0'; // Remove o \n da linha lida
         line[strcspn(line, "\r")] = '\0'; // Remove o \r da linha lida
-        printf("Linha lida: '%s'\n", line); // Log da linha lida
 
         Stack stack, secondary;
         initializeStack(&stack);
         initializeStack(&secondary);
 
-        char *slice = strtok(line, " "); // Quebra a linha em tokens
-        printf("Tokens:\n");
+        char *slice = strtok(line, space); // Quebra a linha em tokens
 
         while (slice != NULL) {
-            printf("  Token: '%s'\n", slice); // Log do token
             if (stack.top == 0 || strcmp(slice, stack.names[stack.top - 1]) >= 0) {
                 push(&stack, slice);
+                if(initialized == 0){
+                    if(lineCount == 0){
+                        sprintf(text, "push-%s", slice);
+                    }else{
+                        sprintf(text, "\npush-%s", slice);
+                    }
+                    initialized = 1;
+                }else{
+                    sprintf(text, "%s push-%s", text, slice);
+                }
             } else {
+                popCount = 0;
                 while (stack.top > 0 && strcmp(slice, stack.names[stack.top - 1]) < 0) {
                     push(&secondary, stack.names[stack.top - 1]);
                     pop(&stack);
+                    popCount++;
                 }
+                sprintf(text, "%s %dx-pop", text, popCount);
                 push(&stack, slice);
+                sprintf(text, "%s push-%s", text, slice);
                 while (secondary.top > 0) {
                     push(&stack, secondary.names[secondary.top - 1]);
+                    sprintf(text, "%s push-%s", text, secondary.names[secondary.top - 1]);
                     pop(&secondary);
                 }
             }
             slice = strtok(NULL, " ");
         }
-
-        printf("\nPilha final:\n");
-        while (stack.top > 0) {
-            printf("%s ", stack.names[stack.top - 1]);
-            pop(&stack);
-        }
-        printf("\n==========================\n");
+        fputs(text, fp_out);
+        lineCount++;
     }
 
     fclose(fp_in);
