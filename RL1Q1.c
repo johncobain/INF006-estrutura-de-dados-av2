@@ -23,7 +23,7 @@ int main(){
     }
 
     char space[] = " ";
-    char lineCount = 0;
+    int lineCount = 0;
 
     while (fgets(line, sizeof(line), fp_in) != NULL){
         List lists[512];
