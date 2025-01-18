@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 typedef struct LI
 {
@@ -13,34 +14,36 @@ typedef struct LI
 typedef struct LE
 {
     int num;
-    struct LI *elementos;
+    int qtdElementos;
+    float elementosValores[100];
+    struct LI elementos[100];
     struct LE *anterior;
     struct LE *prox;
 }LE;
 
 
-void OrdenarVetor(LE arr[], int qtdL, char identificador) {
+void OrdenarLE(LE arr[], int qtdL) {
     int i, j, temp;
-    float tempF = 0;
-    if(identificador == 'E'){
-        for (i = 0; i < qtdL - 1; i++) {
-            for (j = 0; j < qtdL - i - 1 && arr[j].prox != NULL; j++) {
-                if (arr[j].num > arr[j + 1].num) {
-                    temp = arr[j].num;
-                    arr[j].num = arr[j + 1].num;
-                    arr[j + 1].num = temp;
-                }
+    for (i = 0; i < qtdL - 1; i++) {
+        for (j = 0; j < qtdL - i - 1 && arr[j].prox != NULL; j++) {
+            if (arr[j].num > arr[j + 1].num) {
+                temp = arr[j].num;
+                arr[j].num = arr[j + 1].num;
+                arr[j + 1].num = temp;
             }
         }
-    }else
-    if(identificador == 'I'){
-        for (i = 0; i < qtdL - 1; i++) {
-            for (j = 0; j < qtdL - i - 1 && arr[j].prox != NULL; j++) {
-                if (arr[j].num > arr[j + 1].num) {
-                    tempF = arr[j].num;
-                    arr[j].num = arr[j + 1].num;
-                    arr[j + 1].num = tempF;
-                }
+    }
+}
+
+void OrdenarLI(LI arr[], int qtdL) {
+    int i, j;
+    float tempF = 0;
+    for (i = 0; i < qtdL - 1; i++) {
+        for (j = 0; j < qtdL - i - 1 && arr[j].prox != NULL; j++) {
+            if (arr[j].num > arr[j + 1].num) {
+                tempF = arr[j].num;
+                arr[j].num = arr[j + 1].num;
+                arr[j + 1].num = tempF;
             }
         }
     }
@@ -51,7 +54,7 @@ int main(){
     FILE *fp_out = fopen("L1Q3.out", "w");
     char line[1000];
     char space[] = " ";
-    
+    int qtdLinhas = 0;
     if (fp_in == NULL || fp_out == NULL){
         printf("Arquivos nao podem ser abertos.");
         return EXIT_FAILURE;
@@ -60,11 +63,12 @@ int main(){
     printf("TEST");
 
     while (fgets(line, sizeof(line), fp_in) != NULL){
+        qtdLinhas++;
         int qtdLE = 0, qtdLI = 0;
-        LE Ancora[1000];
+        LE *Ancora = malloc(sizeof(LE) * 1000);
         Ancora[0].anterior = NULL;
 
-        LI Elementos[1000];
+        LI *Elementos = malloc(sizeof(LI) * 1000);
 
         char *slice = strtok(line, space);
 
@@ -83,7 +87,7 @@ int main(){
             }
         }
 
-        OrdenarVetor(Ancora, qtdLE, 'E');
+        OrdenarLE(Ancora, qtdLE);
 
         if(strcmp(slice, "LI") == 0){
             slice = strtok(NULL, space);
@@ -92,35 +96,46 @@ int main(){
                     Elementos[i - 1].prox = & Elementos[i];
                 } 
                 Elementos[i].num = atof(slice);
+                Elementos[i].ancorado = 0;
                 qtdLI++;
                 slice = strtok(NULL, space);
             }
         }
 
-        OrdenarVetor(Elementos, qtdLI, 'I');
+        OrdenarLI(Elementos, qtdLI);
 
-        // for(int i = 0; i < qtdLE;i++){
-        //     fprintf(fp_out,"%d ",Ancora[i].num);
-        // }
-        // fprintf(fp_out," | ");
-        // //ordenar lista LE
-
-        fprintf(fp_out,"Ancoras: ");
-        for(int i = 0; i < qtdLE;i++){
-            fprintf(fp_out,"%d ",Ancora[i].num);
+        //Adicionar os Elementos as suas ancoras
+        for(int i = 0; i < qtdLE; i++){
+            for(int j = 0; j < qtdLI; j++){
+                float diff = fabs(Ancora[i].num - Elementos[j].num);
+                if(diff <= 0.99){
+                    if(Elementos[j].ancorado == 0){
+                        Elementos[j].ancorado = 1;
+                        Ancora[i].elementosValores[Ancora[i].qtdElementos] = Elementos[j].num;
+                        Ancora[i].qtdElementos++;
+                    }
+                }
+            }
         }
 
-        fprintf(fp_out,"\nElementos:");
-        for(int i = 0; i < qtdLE;i++){
-            fprintf(fp_out,"%g ",Elementos[i].num);
+        //Organização das linhas
+
+        if(qtdLinhas > 1) fprintf(fp_out, "\n");
+        fprintf(fp_out, "[");
+
+        for(int i = 0; i < qtdLE; i++){
+            fprintf(fp_out, "%d(",Ancora[i].num);
+            for(int j = 0; j < Ancora[i].qtdElementos; j++){
+                fprintf(fp_out, "%g",Ancora[i].elementosValores[j]);
+                if(j < Ancora[i].qtdElementos - 1) fprintf(fp_out, "->");
+            }
+            fprintf(fp_out, ")");
+            if(i < qtdLE - 1) fprintf(fp_out, "->");
         }
-        fprintf(fp_out, "\n");
+        fprintf(fp_out, "]");
 
-
-        //Adquirir todos os elementos da lista circular após o LI
-        // if(strcmp(slice, "LI")){
-
-        // }
+        // free(Ancora);
+        // free(Elementos);
     }
 
     fclose(fp_in);
