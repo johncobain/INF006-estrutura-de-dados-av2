@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 typedef struct LI
 {
@@ -107,7 +106,8 @@ int main(){
         //Adicionar os Elementos as suas ancoras
         for(int i = 0; i < qtdLE; i++){
             for(int j = 0; j < qtdLI; j++){
-                float diff = fabs(Ancora[i].num - Elementos[j].num);
+                float diff = (Ancora[i].num - Elementos[j].num);
+                if(diff < 0) diff *= -1;
                 if(diff <= 0.99){
                     if(Elementos[j].ancorado == 0){
                         Elementos[j].ancorado = 1;
