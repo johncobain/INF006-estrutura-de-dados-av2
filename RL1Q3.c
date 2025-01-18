@@ -59,8 +59,6 @@ int main(){
         return EXIT_FAILURE;
     }
 
-    printf("TEST");
-
     while (fgets(line, sizeof(line), fp_in) != NULL){
         qtdLinhas++;
         int qtdLE = 0, qtdLI = 0;
